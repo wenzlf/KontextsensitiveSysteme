@@ -1,0 +1,58 @@
+<html>
+  <head>
+    <title>Excercise Sheet 2</title>
+    <meta http-equiv="content-type" content="text/html; charset=windows-1252">
+    <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css" type="text/css">
+  </head>
+  <body vlink="#954F72" link="#0563C1" lang="EN-US">
+    <div>
+      <h1>Excercise Features (TBD until 28.05.2018)</h1>
+      <p></p>
+      <p>(You may work in groups or help each other as long as you understand
+        the code and are able to modify/explain each relevant code line (same
+        goes for pasted code from the web).</p>
+      <p><a href="Excercise%20Context.htm">Go to previous excercise</a></p>
+      <h2><a name="ex3"></a>Excercise 3 Calculating features</h2>
+      <ol type="a">
+        <li>
+          <p><span> </span>Download <a href="https://www.rstudio.com/">RStudio
+              <br>
+            </a></p>
+        </li>
+        <li>Use your code from the last excercise to collect data for 3
+          activities with 10 subjects each for 30 seconds (Note: note down each
+          subject as an extra tag in influxdb. You can join forces to collect
+          bigger datasets or change eg.&nbsp;the position of your phone and
+          repeat yourself)</li>
+        <li>
+          <p>Use <a href="https://github.com/mvadu/influxdbr2">InfluxDBr2<span
+                style="color: #982c61;"><span style="color: #4a4a4a;"> </span></span></a><span
+              style="color: #982c61;"><span style="color: #4a4a4a;">to load the
+                data that you collected in excercise 2 into an xts object (use
+                one xts per label and experiment)</span></span></p>
+        </li>
+        <li>
+          <p><span> </span>xts to apply windowing (try non-oververlapping
+            windows first), by using eg.</p>
+          <pre class="lang-r prettyprint prettyprinted" style=""><code><span class="pln">do.call</span><span
+class="pun">(</span><span class="pln">rbind</span><span class="pun">,</span><span
+class="pln"> lapply</span><span class="pun">(</span><span class="pln">split</span><span
+class="pun">(data</span><span class="pln"></span><span class="pun">,</span><span
+class="str">"seconds", k=2</span><span class="pun">),</span><span class="pln"> calc_features</span><span
+class="pun">))</span></code></pre>
+          (Note that the windows version of xts does not support subsecond
+          intervals, you can use the web version<a href="https://hub.docker.com/r/rocker/rstudio/">
+            e.g. via docker</a>)</li>
+        <li>Join all timeseries into a single dataframe. Add your label and
+          experiment/subject to each observation.</li>
+        <li>Use caret to <a href="http://topepo.github.io/caret/visualizations.html">visualize
+            your feature space.</a></li>
+        <li>Extend your code to easily try out and visualize different features</li>
+      </ol>
+      <h2>Solution</h2>
+      <p><a href="Excercise2_solution.html">here</a></p>
+      <ol type="a">
+      </ol>
+    </div>
+  </body>
+</html>

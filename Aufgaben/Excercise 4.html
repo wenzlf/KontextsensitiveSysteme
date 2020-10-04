@@ -1,0 +1,92 @@
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=windows-1252">
+    <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css" type="text/css">
+    <title>Excercise4</title>
+  </head>
+  <body vlink="#954F72" link="#0563C1" lang="EN-US">
+    <div>
+      <h1>Excercise Scoring the Model (TBD until Exam!)</h1>
+      <p></p>
+      <p>(You may work in groups or help each other as long as you understand
+        the code and are able to modify/explain each relevant code line (same
+        goes for pasted code from the web).</p>
+      <p><a href="Excercise%20Context3.htm">Previous Excercise</a></p>
+      <h2><a name="ex3"></a>Excercise 5 Get the classifier into your browser</h2>
+      <ol type="a">
+        <li>
+          <p><span> </span>The predictive model markup language is a common
+            export format for machine learning models. Use the R package pmml to
+            export the classifier (if you want to go the easy way use a decision
+            tree or a random forrest</p>
+        </li>
+        <li>
+          <p>&nbsp;Use the opencpu package to create a webserver that can return
+            your model (tip use XML::saveXML to convert the returnvalue to a
+            string)</p>
+        </li>
+        <li>retrieve the XML from a webpage like this<br>
+          <pre>&nbsp;var pmml = new Promise((resolve,reject) =&gt; {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; var onSuccess = function(data) {resolve($.parseXML(data.pop()));};
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          $.ajax({
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          type: "POST",
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          url: (this.base + "R/getPMML/json"),
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          data: 'json_data={"sensor": ' + JSON.stringify(this.sensors) +
+          ',"classes": ' + JSON.stringify(this.label) + ',"classifier":
+          "rpart"}',
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          success: onSuccess,
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          dataType: "json"
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          });
+          });</pre>
+        </li>
+      </ol>
+      <h2>Excercise 6 Creating a Javascript predictor</h2>
+      <ol type="a">
+        <li>
+          <p><span>&nbsp; Create a decision tree (or any other classifier) from
+              the XML (see e.g.
+              http://stackoverflow.com/questions/8368698/how-to-implement-a-decision-tree-in-javascript-looking-for-a-better-solution-th/8369235#8369235,
+              for the decision tree look for TreeModel and Node in the XML Dom)
+              or use&nbsp;</span> <a href="https://github.com/riedel/jActivity2PMML/tree/master/inst/www">https://github.com/riedel/jActivity2PMML/tree/master/inst/www</a>
+            for a solution how to build the classifier....</p>
+        </li>
+        <li><span>&nbsp;Use the code from excercise 1 to automatically excecute
+            your model (Note: you have to implement windowing and calculate the
+            features you used in javascript)<br>
+            <br>
+          </span></li>
+        <li><span>Check if its working :)</span></li>
+      </ol>
+      <h2>Excercise 7 Let the classifier make changes to your application</h2>
+      <p>Think about a nice application to use the classifier</p>
+      <ol type="a">
+        <li>
+          <p><span> </span>to make a web application context sensitive (you may
+            use <a href="https://github.com/FraunhoferIAO/awc-core/">AWC-core</a>
+            or <a href="http://colmarius.net/cop/">COP.js )<br>
+            </a></p>
+        </li>
+        <ol>
+          <li>You can change the Font-Size (via CSS)</li>
+          <li>You can present different suggestion in a menu if some one is on
+            the move</li>
+        </ol>
+        <li>Think about further applications and write them down</li>
+        <ol>
+          <li>What other inputs from the browser can be used as "sensor"</li>
+          <li>What are interesting contexts</li>
+        </ol>
+      </ol>
+      <h2></h2>
+      <p></p>
+      <ol type="a">
+      </ol>
+    </div>
+  </body>
+</html>

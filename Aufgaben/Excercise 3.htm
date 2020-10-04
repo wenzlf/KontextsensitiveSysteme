@@ -1,0 +1,54 @@
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=windows-1252">
+    <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css" type="text/css">
+  </head>
+  <body vlink="#954F72" link="#0563C1" lang="EN-US">
+    <div>
+      <h1>Excercise Features <br>
+        (TBD until 25.06.2018)</h1>
+      <p></p>
+      <p>(You may work in groups or help each other as long as you understand
+        the code and are able to modify/explain each relevant code line (same
+        goes for pasted code from the web).</p>
+      <h2>Excercise 4 Creating a predictor</h2>
+      <ol type="a">
+        <li>
+          <p><span>&nbsp; Do a leave-one-subject out test train split, eg.:</span></p>
+          <pre class="default prettyprint prettyprinted" style=""><code><span class="pln"></span><span
+class="pun">subjects&lt;-levels(factor(data_prep$subject))
+data_subject &lt;- vector(mode = "list", length = nlevels(data$subject))
+
+for (s in seq(1,nlevels(data$subject)))  data_subject[[s]]&lt;- which(data$subject!=subjects[s])
+trc = trainControl(index=data_subject)
+model = train(data[,-c(1,2)], data$label, method = "nb", trControl=trc)<br></span></code></pre>
+        </li>
+        <li><span class="pun">Use carets <a href="https://www.rdocumentation.org/packages/caret/versions/6.0-76/topics/train">train
+              </a>function to <a href="https://topepo.github.io/caret/model-training-and-tuning.html">train
+              a classifier</a> (try SVM, Naive Bayes, ....) using the
+            leave-out-split</span><br>
+          <pre class="default prettyprint prettyprinted" style=""><code><span class="pln">trainControl</span><span
+class="pun">(</span><span class="pln">method </span><span class="pun">=</span><span
+class="pln"> </span><span class="str">"cv"</span><span class="pun">,</span><span
+class="pln">index </span><span class="pun">=</span><span class="pln"> model_these</span><span
+class="pun">,</span><span class="pln"> classProbs </span><span class="pun">=</span><span
+class="pln">  TRUE</span><span class="pun">))</span></code></pre>
+        </li>
+        <li>Compare the leave-one-subject-out results to other <a href="https://www.rdocumentation.org/packages/caret/versions/6.0-76/topics/trainControl">train-control
+            functions.</a></li>
+        <li><span style="font-family: monospace;"><span style="font-family: serif;">Go
+              back to <a href="Excercise%20Context2.htm#ex3">Excercise <span style="color: #4a4a4a;">2</span></a>
+              and add more feature manually to improve your results</span></span></li>
+        <li><span style=" font-family: monospace;"><span style=" font-family: serif;">Select
+              best feature using a wrapper using carets using caret <a href="http://topepo.github.io/caret/recursive-feature-elimination.html">Recursive
+                Feature Elimination <br>
+              </a></span></span></li>
+      </ol>
+      <p><br>
+      </p>
+      <p><a href="Excercise%20Context2.htm">Previous excercises</a></p>
+      <ol type="a">
+      </ol>
+    </div>
+  </body>
+</html>

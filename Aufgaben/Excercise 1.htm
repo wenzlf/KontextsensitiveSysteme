@@ -1,0 +1,89 @@
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=windows-1252">
+    <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css" type="text/css">
+  </head>
+  <body vlink="#954F72" link="#0563C1" lang="EN-US">
+    <div>
+      <h1>Excercise Context / Sensors (TBD until 14.05.2017)</h1>
+      <p>(You may work in groups or help each other as long as you
+        understand the code and are able to modify/explain each relevant code
+        line
+        (same goes for pasted code from the web).</p>
+      <h2>Excercise 1 Context</h2>
+      <ol type="a">
+        <li>
+          <p><span> </span>Sketch
+            a contextsensitive Application </p>
+        </li>
+        <li>
+          <p><span> </span>Categorize
+            it according to Schilit (explain why)</p>
+        </li>
+        <li>
+          <p><span> </span>Categorize
+            all relevant context regarding category of context, passive/active
+            and
+            primary/secondary</p>
+        </li>
+        <li>
+          <p><span> </span>Modify
+            a. to be in another class according to Schilit (Tip: You may modify
+            the
+            previous answer if this does not work)</p>
+        </li>
+      </ol>
+      <h2>Excercise 2 Sensors</h2>
+      <ol type="a">
+        <li>
+          <p><span>
+            </span>Create a webpage that contains a form with a text field
+            called (call it
+            Context) and a toggle switch</p>
+          <p>(Tip: <a href="https://www.w3schools.com/howto/howto_css_switch.asp">https://www.w3schools.com/howto/howto_css_switch.asp</a>)</p>
+        </li>
+        <li>
+          <p><span>
+            </span>Add a EventListener to the DeviceMotionEvent that gets
+            enabled on
+            Toggle</p>
+          <p>(Tip: <a href="https://www.html5rocks.com/en/tutorials/device/orientation/">https://www.html5rocks.com/en/tutorials/device/orientation/</a>)</p>
+        </li>
+        <li>
+          <p><span>
+            </span>Install a time series data base using docker (<a href="http://www.docker.com">www.docker.com</a>):</p>
+          <pre align="left">docker run -p 8086:8086  
+-v influxdb:/var/lib/influxdb    influxdb</pre>
+          <p> Create a new database called training </p>
+        </li>
+        <li>
+          <p><span> </span>Use influent
+            (<a href="https://github.com/gobwas/influent">https://github.com/gobwas/influent</a>)
+            to write the sensor data to the database within the event listener</p>
+          <p>(Tip: Use Batch and write asynchronously every
+            second or so. You may already aggregate the results to 20 samples
+            per seconds)</p>
+        </li>
+        <li>
+          <p><span> </span>Collect
+            data for some context that may be inferred from accelerometer data</p>
+        </li>
+        <li>
+          <p><span>
+            </span>Optional: Extend with more sensors
+            (http://caniuse.com/ambient-light, <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API">https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API</a>,
+            <a href="https://developer.mozilla.org/en-US/docs/Web/API/Touch_events">https://developer.mozilla.org/en-US/docs/Web/API/Touch_events</a>,
+            )</p>
+        </li>
+      </ol>
+      <h3>Solution/Notes</h3>
+      <ul>
+        <li>Windows 10 Pro/Mac users can use Docker for Windows/Mac and
+          Kitematic to easily start containers</li>
+        <li>Other Windows users can use Docker Toolbox</li>
+      </ul>
+    </div>
+    <div><a href="Excercise1_solution.html">Example
+        Solution for Excercise 2</a></div>
+  </body>
+</html>
