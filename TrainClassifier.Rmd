@@ -16,13 +16,66 @@ devtools::install_github("mvadu/influxdbr2")
 }
 ```
 
-## R Markdown
 
+# Database connection
 
 ```{r cars}
 con <- influx_connection(host = "css20.dmz.teco.edu", scheme="http", port=80) 
 result=influx_query_xts(con,db="browser", "select * FROM devicemotion GROUP BY label, subject")
 ```
+
+# Transform data to table
+
+```{r}
+xts_as_table <- function(xts_file){
+  # loop over every element of xts_file
+  res <- foreach(i=1:length(result),.combine = rbind) %do% {
+      # apply split to do windowing: split by seconds
+      foreach(s=split(result[i][[1]]$values,"second",k=2),.combine = rbind) %do%{
+          # intitialize r
+          r={}
+          # add subject and label
+          r$subject=result[i][[1]]$tags$subject 
+          r$label=result[i][[1]]$tags$label
+          # extract acceleration coordinates x,y,z
+          x=as.numeric(s$accelerationIncludingGravity.x)
+          y=as.numeric(s$accelerationIncludingGravity.x)
+          z=as.numeric(s$accelerationIncludingGravity.z)
+          
+          # calculate rmse from x,y,z
+          three_d=apply(cbind(x,y,z),FUN=function(x) sqrt(sum(x^2)),MARGIN=1)
+          
+          # add mobile
+          r$mobile=as.vector(first(s$mobile)) 
+          # calculate means and add them
+          r$mean_x=mean(x)
+          r$mean_y=mean(y)
+          r$mean_z=mean(z)
+          r$mean_3d=mean(three_d)
+          
+          # calclate variances and add them
+          r$var_x=var(x)
+          r$var_y=var(y)
+          r$var_z=var(z)
+          r$var_3d=var(three_d)
+          
+          # calculate ranges and add them
+          r$minmax_x=max(x)-min(x)
+          r$minmax_y=max(y)-min(y)
+          r$minmax_z=max(z)-min(z)
+          r$minmax_3d=max(three_d)-min(three_d)
+          
+          # return as df to rbind
+          as.data.frame(r)
+        }
+  }
+  return(as.data.frame(res))
+}
+
+test = xts_as_table(result)
+```
+
+
 
 ## Including Plots
 
