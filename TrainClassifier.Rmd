@@ -4,7 +4,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-for(p in c("caret","devtools","xts", "dimRed", "foreach","tidyr","fastICA"))
+for(p in c("caret","devtools","xts", "dimRed", "foreach","tidyr","fastICA", "e1071"))
 if (!require(p,character.only=TRUE)) {
     install.packages(p)
     require(p,character.only=TRUE)
@@ -31,7 +31,7 @@ xts_as_table <- function(xts_file){
   # loop over every element of xts_file
   res <- foreach(i=1:length(result),.combine = rbind) %do% {
       # apply split to do windowing: split by seconds
-      foreach(s=split(result[i][[1]]$values,"second",k=2),.combine = rbind) %do%{
+      foreach(s=split(result[i][[1]]$values,"second",k=2),.combine = rbind) %do% {
           # intitialize r
           r={}
           # add subject and label
@@ -48,22 +48,22 @@ xts_as_table <- function(xts_file){
           # add mobile
           r$mobile=as.vector(first(s$mobile)) 
           # calculate means and add them
-          r$mean_x=mean(x)
-          r$mean_y=mean(y)
-          r$mean_z=mean(z)
-          r$mean_3d=mean(three_d)
+          r$mean_x=mean(x,na.rm = TRUE)
+          r$mean_y=mean(y,na.rm = TRUE)
+          r$mean_z=mean(z,na.rm = TRUE)
+          r$mean_3d=mean(three_d,na.rm = TRUE)
           
           # calclate variances and add them
-          r$var_x=var(x)
-          r$var_y=var(y)
-          r$var_z=var(z)
-          r$var_3d=var(three_d)
+          r$var_x=var(x, na.rm = TRUE)
+          r$var_y=var(y,na.rm = TRUE)
+          r$var_z=var(z, na.rm = TRUE)
+          r$var_3d=var(three_d, na.rm = TRUE)
           
           # calculate ranges and add them
-          r$minmax_x=max(x)-min(x)
-          r$minmax_y=max(y)-min(y)
-          r$minmax_z=max(z)-min(z)
-          r$minmax_3d=max(three_d)-min(three_d)
+          r$minmax_x=max(x,na.rm = TRUE)-min(x,na.rm = TRUE)
+          r$minmax_y=max(y,na.rm = TRUE)-min(y,na.rm = TRUE)
+          r$minmax_z=max(z,na.rm = TRUE)-min(z,na.rm = TRUE)
+          r$minmax_3d=max(three_d,na.rm = TRUE)-min(three_d,na.rm = TRUE)
           
           # return as df to rbind
           as.data.frame(r)
@@ -72,17 +72,16 @@ xts_as_table <- function(xts_file){
   return(as.data.frame(res))
 }
 
-test = xts_as_table(result)
+data <- xts_as_table(result)
 ```
 
+# Data Cleansing
 
+```{r}
+# create new frame to visualize remaining NA values
+data_NA <- data[rowSums(is.na(data)) > 0,]
+data<-drop_na(data)
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+# show dropped NA-Values
+data_NA
 ```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
