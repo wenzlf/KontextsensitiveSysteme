@@ -98,3 +98,34 @@ clean_data %>%
 # boxplot of different labels vs. time
 
 
+
+
+
+
+######################################
+### Exercise 4: Predictor training ###
+######################################
+
+# Leave-one-subject out train test split
+subjects <- levels(factor(clean_data$subject))
+data_subject <- vector(mode = "list", length = nlevels(factor(clean_data$subject)))
+
+for (s in seq(1, nlevels(factor(clean_data$subject)))) {
+  data_subject[[s]]<- which(clean_data$subject != subjects[s])
+}
+
+# train a Naive Bayes classifier using LOSO-split
+
+train(clean_data[,-c(1,2,3)], clean_data[,"label"], method = "ranger",
+      trControl =  trainControl(index = data_subject, summaryFunction = multiClassSummary))
+
+prediction=predict(model,testdata[,-c(1,2,3)])
+confusionMatrix(prediction,as.factor(testdata$label))
+
+# gibt es ein Label, welches nur einmalig vorkommt?
+tmp <- clean_data %>%
+  group_by(label, subject) %>%
+  summarise(n = n()) %>%
+  ungroup()
+table(tmp$subject)
+
