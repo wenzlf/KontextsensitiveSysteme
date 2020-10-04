@@ -78,6 +78,13 @@ data <- xts_as_table(result)
 # Data Cleansing
 
 ```{r}
+# remove testing
+data <- dplyr::filter(data, label!="testing")
+```
+
+
+
+```{r}
 # create new frame to visualize remaining NA values
 data_NA <- data[rowSums(is.na(data)) > 0,]
 data<-drop_na(data)
@@ -85,3 +92,5 @@ data<-drop_na(data)
 # show dropped NA-Values
 data_NA
 ```
+
+
