@@ -1,0 +1,35 @@
+---
+title: "TrainClassifier"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+for(p in c("caret","devtools","xts", "dimRed", "foreach","tidyr","fastICA"))
+if (!require(p,character.only=TRUE)) {
+    install.packages(p)
+    require(p,character.only=TRUE)
+}
+
+if (!require("influxdbr2",character.only=TRUE)) {
+devtools::install_github("mvadu/influxdbr2")
+  require("influxdbr2",character.only=TRUE)
+}
+```
+
+## R Markdown
+
+
+```{r cars}
+con <- influx_connection(host = "css20.dmz.teco.edu", scheme="http", port=80) 
+result=influx_query_xts(con,db="browser", "select * FROM devicemotion GROUP BY label, subject")
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
