@@ -75,6 +75,14 @@ xts_as_table <- function(xts_file){
 data <- xts_as_table(result)
 ```
 
+
+```{r}
+# inspect data frame dim and basic statistics
+dim(data)
+summary(data)
+```
+
+
 # Data Cleansing
 
 ```{r}
@@ -99,14 +107,102 @@ IQR.outliers <- function(data) {
 
 
 
-
 ```{r}
 # create new frame to visualize remaining NA values
 data_NA <- data[rowSums(is.na(data)) > 0,]
-data<-drop_na(data)
 
 # show dropped NA-Values
 data_NA
+
+# remove NA values
+clean_data <- drop_na(data)
+
 ```
 
+
+```{r}
+# outlier removal
+clean_data <- clean_data[clean_data$minmax_3d < (mean(clean_data$minmax_3d) + 2* sd(clean_data$minmax_3d)),]
+clean_data <- clean_data[clean_data$var_3d < (mean(clean_data$var_3d) + 2* sd(clean_data$var_3d)),]
+clean_data <- clean_data[clean_data$mean_3d < (mean(clean_data$mean_3d) + 2* sd(clean_data$mean_3d)),]
+```
+
+```{r}
+# scaling
+prep <- preProcess(clean_data[,-c(1,2,3)], method = c("scale","center"), n.comp=3)
+clean_data <- cbind(clean_data[,c(1,2,3)], predict(prep, clean_data[,-c(1,2,3)]))
+```
+
+
+# Visualizations
+```{r}
+# Boxplot of 3d features
+cols=c(7,11,15)
+caret::featurePlot(x=clean_data[,cols], y=factor(clean_data$label), plot="box", auto.key = list(columns = 2))
+
+```
+
+
+# Exercise 4
+
+Create a Leave-one-Subject-out train and test split
+
+```{r}
+# Leave-one-subject out train test split
+subjects <- levels(factor(clean_data$subject))
+data_subject <- vector(mode = "list", length = nlevels(factor(clean_data$subject)))
+
+for (s in seq(1, nlevels(factor(clean_data$subject)))) {
+  data_subject[[s]]<- which(clean_data$subject != subjects[s])
+}
+```
+
+Train a Naive Bayes Classifier
+```{r}
+# train a Naive Bayes classifier using LOSO-split
+train(clean_data[,-c(1,2,3)], clean_data[,"label"], method = "lssvmRadial",
+      trControl =  trainControl(index = data_subject, summaryFunction = multiClassSummary))
+```
+
+Define trainControl functions
+```{r}
+# use different train control functions:
+# 1. pre-defined function
+trainControl1 <- trainControl(index = data_subject, summaryFunction = multiClassSummary,
+                              verboseIter = T)
+# 2. own function: 
+trainControl2 <- trainControl(method = "LGOCV", summaryFunction = multiClassSummary, 
+                              classProbs = T)
+```
+
+Train different Models using the trainControl functions 
+```{r}
+# used methods (accuracy): naive_bayes (0.71), ranger (0.76), svmRadial (0.58), svmLinear (0.65), 
+# xgbTree (0.77: eta = 0.3, max_depth = 2, colsample_bytree = 0.8, subsample = 0.5, nrounds = 50)
+model_naiveBayes <- train(clean_data[,-c(1,2,3)], clean_data[,"label"], method = "naive_bayes",
+      trControl =  trainControl1)
+
+model_ranger <- train(clean_data[,-c(1,2,3)], clean_data[,"label"], method = "ranger",
+                          trControl =  trainControl1)
+```
+
+```{r}
+#TODO add more feature manually to improve your results
+
+```
+
+
+Select best feature using a wrapper using carets Recursive Feature Elimination
+```{r}
+# define the control using a random forest selection function
+control <- rfeControl(functions=nbFuncs, method="cv", number=10)
+# run the RFE algorithm
+results <- rfe(clean_data[,-c(1,2,3)], factor(clean_data[,"label"]), sizes = c(1:12), rfeControl=control)
+# summarize the results
+print(results)  
+# list the chosen features
+predictors(results)
+# plot the results
+plot(results, type=c("g", "o"))  
+```
 

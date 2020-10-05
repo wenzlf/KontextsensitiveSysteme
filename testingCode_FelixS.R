@@ -4,6 +4,9 @@
 
 ### load packages ###
 library(tidyverse)
+library(MLmetrics)
+library(ellipse)
+
 for(p in c("caret","devtools","xts", "dimRed", "foreach","tidyr","fastICA"))
   if (!require(p,character.only=TRUE)) {
     install.packages(p)
@@ -16,6 +19,7 @@ if (!require("influxdbr2",character.only=TRUE)) {
 }
 
 ### load / query sensor data from InflixDB ###
+# Make sure to be in the KIT Network!!!! Use VPN!!!
 con <- influx_connection(host = "css20.dmz.teco.edu", scheme="http", port=80) 
 result <- influx_query_xts(con,db="browser", "select * FROM devicemotion GROUP BY label, subject")
 
@@ -79,11 +83,30 @@ data_NA <- data[rowSums(is.na(data)) > 0,]
 clean_data <- drop_na(data)
 
 ### Outlier removal ###
-tmp <- clean_data[clean_data$minmax_3d < (mean(clean_data$minmax_3d) + 2* sd(clean_data$minmax_3d)),]
-print(dim(clean_data)[1] - dim(tmp)[1])
-tmp2 <- tmp[tmp$minmax_3d > (mean(tmp$minmax_3d) - 2* sd(tmp$minmax_3d)),]
-print(dim(tmp)[1] - dim(tmp2)[1])
-print((dim(clean_data)[1] - dim(tmp2)[1]) / dim(clean_data)[1] * 100)
+# version 1: mean +/- 2*sd
+# tmp <- clean_data[clean_data$minmax_3d < (mean(clean_data$minmax_3d) + 2* sd(clean_data$minmax_3d)),]
+# print(dim(clean_data)[1] - dim(tmp)[1])
+# tmp2 <- tmp[tmp$minmax_3d > (mean(tmp$minmax_3d) - 2* sd(tmp$minmax_3d)),]
+# print(dim(tmp)[1] - dim(tmp2)[1])
+# print((dim(clean_data)[1] - dim(tmp2)[1]) / dim(clean_data)[1] * 100)
+clean_data <- clean_data[clean_data$minmax_3d < (mean(clean_data$minmax_3d) + 2* sd(clean_data$minmax_3d)),]
+clean_data <- clean_data[clean_data$var_3d < (mean(clean_data$var_3d) + 2* sd(clean_data$var_3d)),]
+clean_data <- clean_data[clean_data$mean_3d < (mean(clean_data$mean_3d) + 2* sd(clean_data$mean_3d)),]
+
+
+# version 2: IQR
+IQR.outliers <- function(data) {
+  Q3<-quantile(data,0.75, na.rm = T)
+  Q1<-quantile(data,0.25, na.rm = T)
+  IQR<-(Q3-Q1)
+  left<- Q1-(1.5*IQR)
+  right<- Q3+(1.5*IQR)
+  print(sum(data < left))
+  print(sum(data > right))
+  index <- data < left | data>right
+  return(which(index))
+}
+IQR.outliers(data$minmax_3d)
 
 
 ### Visualizations ###
@@ -96,8 +119,13 @@ clean_data %>%
   scale_x_log10()
 
 # boxplot of different labels vs. time
+cols=c(7,11,15)
+caret::featurePlot(x=clean_data[,cols], y=factor(clean_data$label), plot="box", auto.key = list(columns = 2))
 
+# scaling
+prep <- preProcess(clean_data[,-c(1,2,3)],method=c("scale","center"),n.comp=3)
 
+clean_data <- cbind(clean_data[,c(1,2,3)],predict(prep,clean_data[,-c(1,2,3)]))
 
 
 
@@ -114,9 +142,10 @@ for (s in seq(1, nlevels(factor(clean_data$subject)))) {
   data_subject[[s]]<- which(clean_data$subject != subjects[s])
 }
 
-# train a Naive Bayes classifier using LOSO-split
+#TODO: Tunegrid for train function
 
-train(clean_data[,-c(1,2,3)], clean_data[,"label"], method = "ranger",
+# train a Naive Bayes classifier using LOSO-split
+train(clean_data[,-c(1,2,3)], clean_data[,"label"], method = "naive_bayes",
       trControl =  trainControl(index = data_subject, summaryFunction = multiClassSummary))
 
 prediction=predict(model,testdata[,-c(1,2,3)])
@@ -127,5 +156,43 @@ tmp <- clean_data %>%
   group_by(label, subject) %>%
   summarise(n = n()) %>%
   ungroup()
-table(tmp$subject)
+table(tmp$label)
 
+
+# # Backlog: using resampling?? 
+# clean_data %>%
+#   group_by(label, subject) %>%
+#   summarise(N = n()) %>%
+#   spread(key = label, value = N)
+
+
+# use different train control functions:
+# 1. pre-defined function
+trainControl1 <- trainControl(index = data_subject, summaryFunction = multiClassSummary,
+                              verboseIter = T)
+# 2. own function: 
+trainControl2 <- trainControl(method = "LGOCV", summaryFunction = multiClassSummary, 
+                              classProbs = T)
+
+
+# used methods (accuracy): naive_bayes (0.71), ranger (0.76), svmRadial (0.58), svmLinear (0.65), 
+# xgbTree (0.77: eta = 0.3, max_depth = 2, colsample_bytree = 0.8, subsample = 0.5, nrounds = 50)
+model_naiveBayes <- train(clean_data[,-c(1,2,3)], clean_data[,"label"], method = "naive_bayes",
+      trControl =  trainControl1)
+
+model_ranger <- train(clean_data[,-c(1,2,3)], clean_data[,"label"], method = "ranger",
+                          trControl =  trainControl1)
+
+#TODO add more feature manually to improve your results
+
+# Select best feature using a wrapper using carets Recursive Feature Elimination
+# define the control using a random forest selection function
+control <- rfeControl(functions=nbFuncs, method="cv", number=10)
+# run the RFE algorithm
+results <- rfe(clean_data[,-c(1,2,3)], factor(clean_data[,"label"]), sizes = c(1:12), rfeControl=control)
+# summarize the results
+print(results)  
+# list the chosen features
+predictors(results)
+# plot the results
+plot(results, type=c("g", "o"))  
