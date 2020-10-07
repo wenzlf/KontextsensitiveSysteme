@@ -38,3 +38,6 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 .Rproj.user
+.ipynb_checkpoints/Train-Classifier-checkpoint.ipynb
+.ipynb_checkpoints/CSS-Exercice-checkpoint.ipynb
+TrainClassifier_files/figure-html/unnamed-chunk-8-1.png
