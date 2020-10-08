@@ -187,6 +187,7 @@ model_ranger <- train(clean_data[,-c(1,2,3)], clean_data[,"label"], method = "ra
 
 # Select best feature using a wrapper using carets Recursive Feature Elimination
 # define the control using a random forest selection function
+# treebagFuncs, nbFuncs, rfFuncs, caretFuncs
 control <- rfeControl(functions=nbFuncs, method="cv", number=10)
 # run the RFE algorithm
 results <- rfe(clean_data[,-c(1,2,3)], factor(clean_data[,"label"]), sizes = c(1:12), rfeControl=control)
